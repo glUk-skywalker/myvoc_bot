@@ -1,0 +1,25 @@
+version: '3'
+services:
+  chrome:
+    container_name: chrome
+    image: selenium/standalone-chrome
+    restart: unless-stopped
+  bot:
+    build:
+      context: ./bot
+    restart: unless-stopped
+    depends_on:
+      - chrome
+    environment:
+      BOT_TOKEN: 99999999:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    volumes:
+      - ./volume:/data
+  backup_daemon:
+    build:
+      context: ./backup_daemon
+    restart: unless-stopped
+    environment:
+      BOT_TOKEN: 99999999:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+      CHAT_ID: 111111111
+    volumes:
+      - ./volume:/data

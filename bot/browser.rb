@@ -11,13 +11,38 @@ class Browser
     @d.manage.timeouts.implicit_wait = 10
   end
 
-  def get_info_for(word)
-    @d.navigate.to url_for(word)
-    elements = @d.find_elements(:xpath, '//*[@class = "fw3eif"]')
-    elements.map(&:text).compact
+  def get_stringified_info_for(word)
+    lines = [word]
+    lines << ''
+
+    info = get_info_for(word)
+
+    lines += info[:descriptions].map! { |d| "• #{d}" }
+
+    lines << ''
+    lines << 'examples:'
+    lines += info[:examples].map! { |d| "• #{d}" }
+
+    lines.join("\n")
   end
 
   private
+
+  def get_info_for(word)
+    info = {}
+
+    @d.navigate.to url_for(word)
+    @d.find_elements(:xpath, '//*[@class = "VK4HE"]').each(&:click)
+    sleep 0.5
+
+    elements = @d.find_elements(:xpath, '//*[@class = "fw3eif"]')
+    info[:descriptions] = elements.map(&:text).compact
+
+    elements = @d.find_elements(:xpath, '//*[@class = "AZPoqf OvhKBb"]')
+    info[:examples] = elements.map(&:text).compact
+
+    info
+  end
 
   def url_for(word)
     "https://translate.google.com/?sl=en&tl=ru&text=#{word}&op=translate"

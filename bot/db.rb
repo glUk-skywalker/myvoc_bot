@@ -67,6 +67,10 @@ class Words
     end
   end
 
+  def uniq!
+    @db.run "DELETE FROM #{TABLE_NAME} WHERE id NOT IN (SELECT min(id) FROM #{TABLE_NAME} GROUP BY word);"
+  end
+
   private
 
   def create_table!

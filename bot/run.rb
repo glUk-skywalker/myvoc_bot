@@ -12,12 +12,15 @@ Telegram::Bot::Client.run(token) do |bot|
   bot.listen do |message|
     case message
     when Telegram::Bot::Types::Message
+
+      words.uniq!
+
       case message.text
       when '/go'
         word = words.pick!.get(:word)
-        defs = browser.get_info_for(word)
-        defs.map! { |d| "• #{d}" }
-        bot.api.send_message(chat_id: message.from.id, text: "#{word}\n#{defs.join("\n")}\n---\nwords active: #{words.active.count} (of #{words.count})")
+        msg = browser.get_stringified_info_for(word)
+        msg += "\n---\nwords active: #{words.active.count} (of #{words.count})"
+        bot.api.send_message(chat_id: message.from.id, text: msg)
       else
         if message.text.lang.first != 'en'
           bot.api.send_message(

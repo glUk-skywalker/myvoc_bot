@@ -7,13 +7,17 @@ services:
   bot:
     build:
       context: ./bot
+      dockerfile: mainbot.Dockerfile
     restart: unless-stopped
     depends_on:
       - chrome
     environment:
       BOT_TOKEN: 99999999:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+      TZ: Europe/Moscow
     volumes:
       - ./volume:/data
+    command: bundle exec ruby run.rb
+    tty: true
 
   backuper:
     build:

@@ -1,8 +1,7 @@
 version: '3'
 services:
   chrome:
-    container_name: chrome
-    image: selenium/standalone-chrome
+    image: selenium/standalone-chrome:3.141.59
     restart: unless-stopped
   bot:
     build:

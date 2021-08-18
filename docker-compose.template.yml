@@ -30,3 +30,20 @@ services:
     volumes:
       - ./volume:/data
     command: bash -c "bundle exec ruby run.rb >> /data/backuper.log 2>&1"
+
+  reminder:
+    build:
+      context: ./bot
+      dockerfile: reminder.Dockerfile
+    restart: unless-stopped
+    depends_on:
+      - chrome
+    environment:
+      TZ: Europe/Moscow
+      BOT_TOKEN: 99999999:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+      TARGET: 111111111
+      REMIND_FREQUENCY: 45
+    volumes:
+      - ./volume:/data
+    command: bundle exec ruby reminder.rb
+    tty: true

@@ -10,7 +10,6 @@ REMIND_GAP = 60 * ENV['REMIND_FREQUENCY'].to_i
 
 log 'starting the reminder daemon..'
 
-Linguo.api_key = 'demo'
 token = ENV['BOT_TOKEN']
 
 log 'waiting in order to ensure Chrome is started..'

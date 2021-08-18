@@ -3,7 +3,6 @@
 require 'telegram/bot'
 require 'sequel'
 require 'csv'
-require 'linguo'
 require 'selenium-webdriver'
 
 require_relative 'db'

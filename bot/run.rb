@@ -8,7 +8,6 @@ def log(msg)
   File.open('/data/mainbot.log', 'a') { |f| f.puts msg }
 end
 
-Linguo.api_key = 'demo'
 token = ENV['BOT_TOKEN']
 
 log 'bot started!'
@@ -55,14 +54,6 @@ Telegram::Bot::Client.run(token) do |bot|
           retry
         end
       else
-        if message.text.lang.first != 'en'
-          bot.api.send_message(
-            chat_id: message.from.id,
-            text: 'this word does not look like an English word'
-          )
-          next
-        end
-
         if words.presents?(message.text)
           bot.api.send_message(
             chat_id: message.from.id,

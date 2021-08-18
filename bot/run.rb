@@ -11,22 +11,49 @@ end
 Linguo.api_key = 'demo'
 token = ENV['BOT_TOKEN']
 
+log 'bot started!'
+log 'seleeping some time to ensure the browser is started..'
+sleep 15 # wait while chrome is starting
+
 words = Words.new
 browser = Browser.new
 
+log 'initialization is done! listening..'
 Telegram::Bot::Client.run(token) do |bot|
   bot.listen do |message|
+    log "a message!! #{message.text}"
     case message
     when Telegram::Bot::Types::Message
 
+      log 'words uniqing..'
       words.uniq!
 
       case message.text
       when '/go'
+        log 'picking a word..'
         word = words.pick!.get(:word)
-        msg = browser.get_stringified_info_for(word)
+        begin
+          log "getting info for '#{word}'.."
+          msg = browser.get_stringified_info_for(word)
+        rescue => e
+          log "whoops!! something went wrong while getting the word info :("
+          log e.message
+          log 'inititating a new borwser..'
+          browser = Browser.new
+          retry
+        end
+
         msg += "\n---\nwords active: #{words.active.count} (of #{words.count})"
-        bot.api.send_message(chat_id: message.from.id, text: msg)
+
+        begin
+          log "sending info for '#{word}'.."
+          bot.api.send_message(chat_id: message.from.id, text: msg, parse_mode: 'html')
+          log 'sent!'
+        rescue => e
+          log "whoops! something went wrong while sending the message :("
+          log e.message
+          retry
+        end
       else
         if message.text.lang.first != 'en'
           bot.api.send_message(

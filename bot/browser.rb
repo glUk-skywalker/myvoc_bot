@@ -2,26 +2,41 @@
 
 class Browser
   def initialize
+    Selenium::WebDriver.logger.level = :error
+
+    client = Selenium::WebDriver::Remote::Http::Default.new
+
     @d = Selenium::WebDriver.for(
-      :remote,
+      :chrome,
       url: 'http://chrome:4444/wd/hub',
-      http_client: Selenium::WebDriver::Remote::Http::Default.new,
+      http_client: client,
       desired_capabilities: caps
     )
-    @d.manage.timeouts.implicit_wait = 10
+    @d.manage.timeouts.implicit_wait = 5
   end
 
   def get_stringified_info_for(word)
-    lines = [word]
-    lines << ''
+    lines = []
+
+    lines << "<b>#{word}</b>"
 
     info = get_info_for(word)
 
-    lines += info[:descriptions].map! { |d| "• #{d}" }
+    if info[:descriptions].any?
+      lines << ''
+      lines += info[:descriptions].map! { |d| "• #{d}" }
+    end
 
-    lines << ''
-    lines << 'examples:'
-    lines += info[:examples].map! { |d| "• #{d}" }
+    if info[:examples].any?
+      lines << ''
+      lines << 'examples:'
+      lines += info[:examples].map! { |d| "• #{d}" }
+    end
+
+    if info[:translations].any?
+      lines << ''
+      lines << info[:translations].join(', ')
+    end
 
     lines.join("\n")
   end
@@ -39,7 +54,10 @@ class Browser
     info[:descriptions] = elements.map(&:text).compact
 
     elements = @d.find_elements(:xpath, '//*[@class = "AZPoqf OvhKBb"]')
-    info[:examples] = elements.map(&:text).compact
+    info[:examples] = elements.map(&:text).compact.map { |ex| ex.gsub(word, "<i>#{word}</i>") }
+
+    elements = @d.find_elements(:xpath, '//*[@class = "kgnlhe"]')
+    info[:translations] = elements.map(&:text).compact
 
     info
   end
@@ -52,7 +70,15 @@ class Browser
     prefs = {
       version: 'latest',
       chromeOptions: {
-        w3c: false
+        w3c: false,
+        args: [
+          '--no-sandbox',
+          '--disable-dev-shm-usage',
+          '--no-default-browser-check',
+          '--start-maximized',
+          '--headless',
+          '--whitelisted-ips'
+        ]
       }
     }
     Selenium::WebDriver::Remote::Capabilities.chrome(prefs)

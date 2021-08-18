@@ -3,6 +3,7 @@ services:
   chrome:
     image: selenium/standalone-chrome:3.141.59
     restart: unless-stopped
+
   bot:
     build:
       context: ./bot
@@ -13,12 +14,15 @@ services:
       BOT_TOKEN: 99999999:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
     volumes:
       - ./volume:/data
-  backup_daemon:
+
+  backuper:
     build:
-      context: ./backup_daemon
+      context: ./backuper
     restart: unless-stopped
     environment:
       BOT_TOKEN: 99999999:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
       CHAT_ID: 111111111
+      TZ: Europe/Moscow
     volumes:
       - ./volume:/data
+    command: bash -c "bundle exec ruby run.rb >> /data/backuper.log 2>&1"

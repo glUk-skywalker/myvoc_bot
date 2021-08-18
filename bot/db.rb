@@ -51,7 +51,7 @@ class Words
     return unless File.exist?(SEEDS_PATH)
 
     CSV.read(SEEDS_PATH).each do |item_data|
-      @words.insert(word: item_data[0], active: 1)
+      @words.insert(word: item_data[0], active: item_data[1])
     end
   end
 

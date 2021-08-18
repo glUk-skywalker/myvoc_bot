@@ -2,6 +2,12 @@
 
 require_relative 'requires'
 
+def log(msg)
+  msg = "#{Time.now}\t#{msg}"
+  puts msg
+  File.open('/data/mainbot.log', 'a') { |f| f.puts msg }
+end
+
 Linguo.api_key = 'demo'
 token = ENV['BOT_TOKEN']
 
